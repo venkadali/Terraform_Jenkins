@@ -1,18 +1,24 @@
 pipeline {
     agent any
 
+    environment {
+        AWS_REGION = 'ap-south-1'
+    }
+
     stages {
-        stage('Terraform Destroy') {
+        stage('Terraform Init & Destroy') {
             steps {
-                 withCredentials([usernamePassword(credentialsId: 'aws-credentials',
-                                                 usernameVariable: 'AWS_ACCESS_KEY_ID',
-                                                 passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-credentials' // use same ID as apply job
+                ]]) {
                     bat '''
-                        set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
-                        set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                        terraform init
                         terraform destroy -auto-approve
                     '''
                 }
             }
         }
-    }}
+    }
+}
+
