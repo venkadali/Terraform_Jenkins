@@ -4,22 +4,16 @@ pipeline {
     stages {
         stage('Terraform Destroy') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'aws-credentials',
-                        usernameVariable: 'AWS_ACCESS_KEY_ID',
-                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-                    )
-                ]) {
+                 withCredentials([usernamePassword(credentialsId: 'aws-credentials',
+                                                 usernameVariable: 'AWS_ACCESS_KEY_ID',
+                                                 passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     bat '''
-                        set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID% && ^
-                        set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY% && ^
-                        terraform init && ^
-                        terraform destroy -auto-approve
+                        set AWS_ACCESS_KEY_ID=%AWS_ACCESS_KEY_ID%
+                        set AWS_SECRET_ACCESS_KEY=%AWS_SECRET_ACCESS_KEY%
+                        terraform init && terraform destroy -auto-approve
                     '''
                 }
             }
         }
     }
 }
-
